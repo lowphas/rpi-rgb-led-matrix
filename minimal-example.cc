@@ -10,6 +10,9 @@
 #include <unistd.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+#define dist(a, b, c, d) sqrt(double((a - c) * (a - c) + (b - d) * (b - d)))
 
 using rgb_matrix::GPIO;
 using rgb_matrix::RGBMatrix;
@@ -22,16 +25,31 @@ static void DrawOnCanvas(Canvas *canvas) {
    */
   canvas->Fill(0, 0, 255);
 
-  int center_x = canvas->width() / 2;
-  int center_y = canvas->height() / 2;
-  float radius_max = canvas->width() / 2;
-  float angle_step = 1.0 / 360;
-  for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
-    float dot_x = cos(a * 2 * M_PI) * r;
-    float dot_y = sin(a * 2 * M_PI) * r;
-    canvas->SetPixel(center_x + dot_x, center_y + dot_y,
-                     255, 0, 0);
-    usleep(1 * 1000);  // wait a little to slow down things.
+  int asd=0;
+  srand(time(NULL));
+  int i,j,color;
+  int time=0;
+
+
+
+  while(asd==0){
+          time++;
+          if(time>=6000)time=0;
+
+          for (i=0;i<32;i++) {
+                  for (j=0;j<32;j++) {
+
+                        double value = sin(dist(i+time , j, 128.0, 128.0) / 4.0)
+                                 + sin(dist(i, j, 64.0, 64.0) / 4.0)
+                                 + sin(dist(i, j, 192.0, 64) / 4.0)
+                                 + sin(dist(i, j+time, 192.0, 100.0) / 4.0);
+                        color = int((4 + value)) * 32;
+
+                        canvas->SetPixel(i, j, color, color*2, 255 - color);
+                  }
+          }
+
+      usleep(1 * 50000);
   }
 }
 
